@@ -1,0 +1,13 @@
+{
+  "name": "gainzfitness/gym-management-system",
+  "description": "BIG Gainz Fitness Gym Membership Management System with Merge Sort & Binary Search",
+  "type": "project",
+  "require": {
+    "php": ">=8.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/"
+    }
+  }
+}
