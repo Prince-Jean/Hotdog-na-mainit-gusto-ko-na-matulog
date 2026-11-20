@@ -433,7 +433,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           </div>
 
           <div class="extra-row">
-            <a href="#" class="forgot-btn">Forgot Password?</a>
+            <!-- <a href="#" class="forgot-btn">Forgot Password?</a> -->
           </div>
 
           <button type="submit" class="submit-btn">Log In</button>
