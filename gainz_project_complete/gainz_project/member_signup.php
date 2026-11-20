@@ -351,7 +351,7 @@ $activePeriodLabel = $selectedBilling === 'yearly' ? '/yr' : '/mo';
       </a>
 
       <div class="header-actions">
-        <a href="login.php" class="btn-nav-action">Sign In</a>
+        <!-- <a href="login.php" class="btn-nav-action">Sign In</a> -->
         <a href="index.php" class="btn-nav-action">Back to Home</a>
       </div>
     </div>
