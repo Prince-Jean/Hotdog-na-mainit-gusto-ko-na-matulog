@@ -5,34 +5,6 @@ require_once __DIR__ . '/app/bootstrap.php';
 
 use App\Models\Client;
 use App\Models\Trainer;
-use App\Models\PaymentAndMessage;
-
-$contactNotice = null;
-$contactError = null;
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_contact'])) {
-    $fn = trim($_POST['first_name'] ?? '');
-    $ln = trim($_POST['last_name'] ?? '');
-    $email = trim($_POST['email'] ?? '');
-    $phone = trim($_POST['phone'] ?? '');
-    $msg = trim($_POST['message_body'] ?? '');
-
-    if ($fn === '' || $ln === '' || !filter_var($email, FILTER_VALIDATE_EMAIL) || $msg === '') {
-        $contactError = 'Please fill in all required fields with a valid email address.';
-    } else {
-        try {
-            $pm = new PaymentAndMessage();
-            $ok = $pm->createContactMessage($fn, $ln, $email, $phone, $msg);
-            if ($ok) {
-                $contactNotice = 'Thank you! Your inquiry has been sent to our Dagupan front desk team.';
-            } else {
-                $contactError = 'Unable to submit inquiry at this moment.';
-            }
-        } catch (Throwable $e) {
-            $contactError = 'Database connection unavailable. Please import database/gym_database.sql first.';
-        }
-    }
-}
 
 $memberships = [];
 $trainers = [];
@@ -168,29 +140,43 @@ $planFeaturesMap = [
       padding: 0;
     }
 
+    html {
+      overflow-x: hidden;
+      max-width: 100%;
+    }
+
     body {
       background-color: var(--bg-dark);
       color: var(--text-main);
       font-family: var(--font-body-descriptions);
       overflow-x: hidden;
+      max-width: 100%;
       scroll-behavior: smooth;
     }
 
     p, span, li, div, button {
       font-family: var(--font-body-descriptions);
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
 
     a {
       text-decoration: none;
       color: inherit;
+      overflow-wrap: anywhere;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
     }
 
     .site-container {
       width: 100%;
       max-width: 1240px;
       margin: 0 auto;
-      padding-left: 20px;
-      padding-right: 20px;
+      padding-left: clamp(12px, 3vw, 20px);
+      padding-right: clamp(12px, 3vw, 20px);
     }
 
     .text-stroke {
@@ -232,6 +218,7 @@ $planFeaturesMap = [
       top: 0;
       left: 0;
       width: 100%;
+      max-width: 100%;
       z-index: 1000;
       background: rgba(10, 10, 12, 0.85);
       backdrop-filter: blur(12px);
@@ -249,22 +236,26 @@ $planFeaturesMap = [
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 10px;
+      width: 100%;
       max-width: 1240px;
       margin: 0 auto;
-      padding: 18px 20px;
+      padding: clamp(12px, 2.5vw, 18px) clamp(12px, 3vw, 20px);
     }
 
     .site-brand {
       display: flex;
       align-items: center;
       font-family: var(--font-logo);
-      font-size: 1.4rem;
+      font-size: clamp(1.1rem, 4vw, 1.4rem);
       color: #fff;
+      min-width: 0;
     }
 
     .logo-icon {
       font-family: var(--font-logo);
-      margin-right: 8px;
+      margin-right: 6px;
+      flex-shrink: 0;
     }
 
     .logo-text {
@@ -276,9 +267,10 @@ $planFeaturesMap = [
       background: transparent;
       border: none;
       color: #fff;
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       cursor: pointer;
       padding: 5px;
+      flex-shrink: 0;
     }
 
     .nav-drawer {
@@ -345,9 +337,11 @@ $planFeaturesMap = [
     .hero-section {
       position: relative;
       min-height: 100vh;
+      width: 100%;
       background: url('assets/img1.jpg') center/cover no-repeat;
       display: flex;
       align-items: center;
+      overflow: hidden;
     }
 
     .hero-overlay {
@@ -363,8 +357,8 @@ $planFeaturesMap = [
     .hero-container {
       position: relative;
       z-index: 2;
-      padding-top: 100px;
-      padding-bottom: 60px;
+      padding-top: 90px;
+      padding-bottom: 50px;
     }
 
     .hero-flex {
@@ -372,15 +366,18 @@ $planFeaturesMap = [
       flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      gap: 40px;
+      gap: clamp(20px, 4vw, 40px);
     }
 
     .hero-left {
-      flex: 1 1 500px;
+      flex: 1 1 260px;
+      min-width: 0;
     }
 
     .hero-right {
-      flex: 0 1 380px;
+      flex: 1 1 260px;
+      max-width: 380px;
+      min-width: 0;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
@@ -389,30 +386,32 @@ $planFeaturesMap = [
     .hero-title {
       font-family: var(--font-hero-title) !important;
       font-weight: 900 !important;
-      font-size: clamp(2.8rem, 6vw, 5.5rem);
-      line-height: 0.95;
-      letter-spacing: -1px;
+      font-size: clamp(2rem, 8vw, 5.5rem);
+      line-height: 0.98;
+      letter-spacing: -0.5px;
       text-transform: uppercase;
     }
 
     .transformation-box {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
+      gap: 10px;
       margin-top: 25px;
     }
 
     .transformation-avatars {
       display: flex;
-      margin-right: 15px;
+      margin-right: 8px;
     }
 
     .avatar {
-      width: 45px;
-      height: 45px;
+      width: clamp(36px, 9vw, 45px);
+      height: clamp(36px, 9vw, 45px);
       border-radius: 50%;
       object-fit: cover;
       border: 2px solid var(--bg-dark);
-      margin-left: -12px;
+      margin-left: -10px;
     }
 
     .avatar:first-child {
@@ -422,7 +421,7 @@ $planFeaturesMap = [
     .transformation-count {
       font-family: var(--font-transformation) !important;
       font-weight: 800;
-      font-size: 1.8rem;
+      font-size: clamp(1.35rem, 5vw, 1.8rem);
       line-height: 1;
     }
 
@@ -436,7 +435,7 @@ $planFeaturesMap = [
       font-family: var(--font-hero-desc) !important;
       font-weight: 400 !important;
       color: var(--text-muted);
-      font-size: 1.3rem;
+      font-size: clamp(0.95rem, 3.8vw, 1.3rem);
       line-height: 1.6;
       margin-bottom: 25px;
     }
@@ -447,12 +446,13 @@ $planFeaturesMap = [
       text-transform: uppercase;
       background-color: var(--accent-light);
       color: #000;
-      padding: 12px 28px;
+      padding: 12px clamp(16px, 4vw, 28px);
       border-radius: 4px;
-      letter-spacing: 2.5px;
+      letter-spacing: clamp(1px, 0.5vw, 2.5px);
       transition: var(--transition-fast);
       display: inline-block;
-      font-size: 1.3rem;
+      font-size: clamp(0.95rem, 3.8vw, 1.3rem);
+      max-width: 100%;
     }
 
     .btn-member:hover {
@@ -463,7 +463,8 @@ $planFeaturesMap = [
     }
 
     .studio-section {
-      padding: 60px 0;
+      padding: clamp(40px, 7vw, 60px) 0;
+      overflow: hidden;
     }
 
     .section-header-flex {
@@ -471,15 +472,17 @@ $planFeaturesMap = [
       flex-wrap: wrap;
       align-items: flex-start;
       justify-content: space-between;
-      gap: 30px;
+      gap: 24px;
     }
 
     .section-title-col {
-      flex: 1 1 450px;
+      flex: 1 1 260px;
+      min-width: 0;
     }
 
     .section-desc-col {
-      flex: 1 1 400px;
+      flex: 1 1 260px;
+      min-width: 0;
     }
 
     .studio-title,
@@ -489,15 +492,15 @@ $planFeaturesMap = [
     .section-title {
       font-family: var(--font-section-titles) !important;
       font-weight: 900 !important;
-      font-size: clamp(2rem, 4vw, 3rem);
-      line-height: 1.1;
+      font-size: clamp(1.55rem, 6.2vw, 3rem);
+      line-height: 1.15;
       text-transform: uppercase;
     }
 
     .section-description {
       font-family: var(--font-body-descriptions) !important;
       color: var(--text-muted);
-      font-size: 1.3rem;
+      font-size: clamp(0.92rem, 3.6vw, 1.3rem);
       line-height: 1.6;
     }
 
@@ -515,12 +518,14 @@ $planFeaturesMap = [
 
     .carousel-flex-row {
       display: flex;
+      flex-wrap: nowrap;
       gap: 18px;
       width: 100%;
     }
 
     .carousel-card {
       flex: 1 1 25%;
+      min-width: 0;
     }
 
     .carousel-img {
@@ -538,19 +543,21 @@ $planFeaturesMap = [
     }
 
     .trainers-section {
-      padding: 60px 0;
+      padding: clamp(40px, 7vw, 60px) 0;
     }
 
     .flex-cards-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 20px;
+      gap: 18px;
       margin-top: 20px;
+      width: 100%;
     }
 
     .card-column {
-      flex: 1 1 calc(25% - 20px);
-      min-width: 240px;
+      flex: 1 1 220px;
+      min-width: 0;
+      max-width: 100%;
     }
 
     .trainer-card {
@@ -571,7 +578,7 @@ $planFeaturesMap = [
 
     .trainer-img-wrapper {
       width: 100%;
-      height: 260px;
+      height: clamp(200px, 48vw, 260px);
       overflow: hidden;
     }
 
@@ -587,13 +594,13 @@ $planFeaturesMap = [
     }
 
     .trainer-info {
-      padding: 20px 15px;
+      padding: 18px 14px;
       text-align: center;
     }
 
     .trainer-info h5 {
       font-family: var(--font-body-descriptions) !important;
-      font-size: 1.1rem;
+      font-size: clamp(1rem, 3.8vw, 1.1rem);
       font-weight: 700;
       margin-bottom: 4px;
     }
@@ -615,6 +622,7 @@ $planFeaturesMap = [
 
     .social-links {
       display: flex;
+      flex-wrap: wrap;
       justify-content: center;
       gap: 12px;
     }
@@ -630,26 +638,29 @@ $planFeaturesMap = [
     }
 
     .plans-section {
-      padding: 60px 0;
+      padding: clamp(40px, 7vw, 60px) 0;
     }
 
     .toggle-switch-wrapper {
-      display: flex;
+      display: inline-flex;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: center;
+      gap: 6px;
       background-color: var(--bg-card);
-      padding: 8px 24px;
+      padding: 8px clamp(14px, 4vw, 24px);
       border-radius: 30px;
       border: 1px solid rgba(255, 255, 255, 0.08);
       margin-bottom: 40px;
+      max-width: 100%;
     }
 
     .toggle-label {
       font-family: var(--font-inter) !important;
       font-weight: 400 !important;
-      font-size: 0.9rem;
+      font-size: clamp(0.82rem, 3.2vw, 0.9rem);
       color: var(--text-muted);
-      margin: 0 12px;
+      margin: 0 8px;
       transition: var(--transition-fast);
     }
 
@@ -662,6 +673,7 @@ $planFeaturesMap = [
       display: inline-block;
       width: 45px;
       height: 24px;
+      flex-shrink: 0;
     }
 
     .custom-toggle input {
@@ -704,15 +716,16 @@ $planFeaturesMap = [
     }
 
     .plan-card-column {
-      flex: 1 1 calc(33.333% - 20px);
-      min-width: 280px;
+      flex: 1 1 250px;
+      min-width: 0;
+      max-width: 100%;
     }
 
     .plan-card {
       position: relative;
       background-color: #2D2D2F !important;
       border-radius: 8px;
-      padding: 35px 25px;
+      padding: clamp(24px, 5vw, 35px) clamp(16px, 4vw, 25px);
       display: flex;
       flex-direction: column;
       height: 100%;
@@ -749,7 +762,7 @@ $planFeaturesMap = [
     .plan-title {
       font-family: var(--font-body-descriptions) !important;
       font-weight: 900 !important;
-      font-size: 1.3rem;
+      font-size: clamp(1.1rem, 4vw, 1.3rem);
       margin-bottom: 12px;
     }
 
@@ -763,14 +776,14 @@ $planFeaturesMap = [
     .plan-price {
       font-family: var(--font-body-descriptions) !important;
       font-weight: 800 !important;
-      font-size: 2.5rem;
+      font-size: clamp(1.85rem, 6.5vw, 2.5rem);
       line-height: 1;
     }
 
     .plan-price .currency {
       font-family: var(--font-body-descriptions) !important;
       font-weight: 800 !important;
-      font-size: 1.5rem;
+      font-size: clamp(1.15rem, 4vw, 1.5rem);
       vertical-align: super;
       margin-right: 2px;
     }
@@ -797,13 +810,15 @@ $planFeaturesMap = [
       color: #d1d5db;
       margin-bottom: 12px;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 10px;
     }
 
     .plan-features li i {
       color: #fff;
       font-size: 0.9rem;
+      margin-top: 2px;
+      flex-shrink: 0;
     }
 
     .btn-plan {
@@ -830,7 +845,7 @@ $planFeaturesMap = [
 
     .connect-section {
       position: relative;
-      padding: 80px 0 90px 0;
+      padding: clamp(50px, 8vw, 80px) 0 clamp(60px, 9vw, 90px) 0;
       overflow: hidden;
     }
 
@@ -851,16 +866,20 @@ $planFeaturesMap = [
       position: relative;
       z-index: 1;
       display: grid;
-      grid-template-columns: 1fr 1.05fr;
-      gap: 50px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: clamp(24px, 4vw, 50px);
       align-items: start;
+    }
+
+    .connect-grid > div {
+      min-width: 0;
     }
 
     .connect-left-heading {
       font-family: var(--font-section-titles) !important;
       font-weight: 900 !important;
-      font-size: clamp(2rem, 3.6vw, 2.85rem);
-      line-height: 1.12;
+      font-size: clamp(1.55rem, 6vw, 2.85rem);
+      line-height: 1.15;
       text-transform: uppercase;
       color: #fff;
       margin-bottom: 18px;
@@ -885,17 +904,19 @@ $planFeaturesMap = [
       flex-direction: column;
       gap: 16px;
       max-width: 410px;
+      width: 100%;
     }
 
     .contact-channel-box {
       display: flex;
       align-items: center;
-      gap: 18px;
+      gap: 14px;
       background-color: #0c0d10;
       border: 1px solid rgba(255, 255, 255, 0.16);
       border-radius: 14px;
-      padding: 15px 22px;
+      padding: 14px clamp(12px, 3.5vw, 22px);
       transition: var(--transition-fast);
+      min-width: 0;
     }
 
     .contact-channel-box:hover {
@@ -904,9 +925,9 @@ $planFeaturesMap = [
     }
 
     .contact-channel-icon {
-      font-size: 1.35rem;
+      font-size: 1.25rem;
       color: #ffffff;
-      width: 26px;
+      width: 24px;
       text-align: center;
       flex-shrink: 0;
     }
@@ -915,6 +936,7 @@ $planFeaturesMap = [
       display: flex;
       flex-direction: column;
       gap: 2px;
+      min-width: 0;
     }
 
     .contact-channel-label {
@@ -925,7 +947,7 @@ $planFeaturesMap = [
 
     .contact-channel-value {
       font-family: var(--font-inter) !important;
-      font-size: 0.92rem;
+      font-size: clamp(0.8rem, 3.3vw, 0.92rem);
       font-weight: 700;
       color: #ffffff;
     }
@@ -934,13 +956,14 @@ $planFeaturesMap = [
       background: linear-gradient(145deg, #232428 0%, #141518 65%, #191a1e 100%);
       border: 1px solid rgba(255, 255, 255, 0.14);
       border-radius: 22px;
-      padding: 36px 34px;
+      padding: clamp(20px, 4.5vw, 36px) clamp(16px, 4vw, 34px);
       box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75);
+      min-width: 0;
     }
 
     .connect-form-title {
       font-family: var(--font-inter) !important;
-      font-size: 1.45rem;
+      font-size: clamp(1.15rem, 4.5vw, 1.45rem);
       font-weight: 700;
       color: #ffffff;
       margin-bottom: 6px;
@@ -961,7 +984,8 @@ $planFeaturesMap = [
       margin-bottom: 6px;
     }
 
-    .connect-form-shell .form-control {
+    .connect-form-shell .form-control,
+    .connect-form-shell .form-select {
       background-color: #36373b;
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 8px;
@@ -969,13 +993,15 @@ $planFeaturesMap = [
       font-family: var(--font-inter) !important;
       font-size: 0.88rem;
       padding: 10px 14px;
+      max-width: 100%;
     }
 
     .connect-form-shell .form-control::placeholder {
       color: #8e929e;
     }
 
-    .connect-form-shell .form-control:focus {
+    .connect-form-shell .form-control:focus,
+    .connect-form-shell .form-select:focus {
       background-color: #3e3f44;
       border-color: rgba(255, 255, 255, 0.3);
       color: #ffffff;
@@ -990,7 +1016,7 @@ $planFeaturesMap = [
       background-color: #38393d;
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 8px;
-      padding: 12px 20px;
+      padding: 12px 16px;
       width: 100%;
       cursor: pointer;
       transition: var(--transition-fast);
@@ -1004,16 +1030,21 @@ $planFeaturesMap = [
     .site-footer {
       background-color: #050506;
       border-top: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 64px 0 28px 0;
+      padding: clamp(40px, 7vw, 64px) 0 28px 0;
       color: var(--text-muted);
+      overflow: hidden;
     }
 
     .footer-top-grid {
       display: grid;
-      grid-template-columns: 1.35fr 1fr 1.15fr 1.15fr;
-      gap: 40px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: clamp(20px, 4vw, 40px);
       padding-bottom: 52px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .footer-top-grid > div {
+      min-width: 0;
     }
 
     .footer-brand-stack {
@@ -1034,8 +1065,8 @@ $planFeaturesMap = [
     .footer-logo-top {
       font-family: var(--font-section-titles) !important;
       font-weight: 900;
-      font-size: 2rem;
-      letter-spacing: 3px;
+      font-size: clamp(1.4rem, 5vw, 2rem);
+      letter-spacing: clamp(1px, 0.5vw, 3px);
       display: flex;
       align-items: center;
       gap: 2px;
@@ -1045,13 +1076,14 @@ $planFeaturesMap = [
       font-family: var(--font-section-titles) !important;
       font-weight: 800;
       font-size: 0.62rem;
-      letter-spacing: 3.5px;
+      letter-spacing: clamp(1px, 0.5vw, 3.5px);
       color: #d1d5db;
       margin-top: 3px;
     }
 
     .footer-socials {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       gap: 16px;
       margin-top: 4px;
@@ -1135,11 +1167,17 @@ $planFeaturesMap = [
 
     @media (max-width: 992px) {
       .hero-section {
-        margin-top: 100px;
+        margin-top: 70px;
+        min-height: auto;
+      }
+
+      .hero-container {
+        padding-top: 40px;
+        padding-bottom: 50px;
       }
 
       .hero-title {
-        font-size: 5rem;
+        font-size: clamp(2.1rem, 8.5vw, 5rem);
       }
 
       .hero-flex {
@@ -1149,6 +1187,7 @@ $planFeaturesMap = [
 
       .hero-right {
         align-items: center;
+        max-width: 100%;
       }
 
       .transformation-box {
@@ -1156,15 +1195,24 @@ $planFeaturesMap = [
       }
 
       .carousel-flex-row {
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .carousel-flex-row::-webkit-scrollbar {
+        display: none;
       }
 
       .carousel-card {
-        flex: 1 1 calc(50% - 10px);
+        flex: 0 0 85%;
+        scroll-snap-align: center;
       }
 
       .carousel-img {
-        height: 190px;
+        height: 210px;
       }
 
       .curved-frame {
@@ -1172,7 +1220,7 @@ $planFeaturesMap = [
       }
 
       .connect-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
         gap: 36px;
       }
 
@@ -1181,7 +1229,7 @@ $planFeaturesMap = [
       }
 
       .footer-top-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
       .hamburger-btn {
@@ -1191,17 +1239,19 @@ $planFeaturesMap = [
       .nav-drawer {
         position: fixed;
         top: 0;
-        right: -300px;
-        width: 280px;
+        right: -100%;
+        width: min(280px, 85vw);
+        max-width: 100vw;
         height: 100vh;
         background-color: #121316;
         flex-direction: column;
         align-items: flex-start;
-        padding: 30px 25px;
-        gap: 30px;
+        padding: 24px 20px;
+        gap: 24px;
         z-index: 1002;
         transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
         box-shadow: -5px 0 25px rgba(0, 0, 0, 0.8);
+        overflow-y: auto;
       }
 
       .nav-drawer.open {
@@ -1282,15 +1332,24 @@ $planFeaturesMap = [
       }
 
       .carousel-flex-row {
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .carousel-flex-row::-webkit-scrollbar {
+        display: none;
       }
 
       .carousel-card {
-        flex: 1 1 calc(50% - 10px);
+        flex: 0 0 88%;
+        scroll-snap-align: center;
       }
 
       .carousel-img {
-        height: 175px;
+        height: 195px;
       }
 
       .curved-frame {
@@ -1298,17 +1357,29 @@ $planFeaturesMap = [
       }
 
       .connect-form-shell {
-        padding: 26px 20px;
+        padding: 24px 16px;
       }
 
       .footer-top-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
         gap: 28px;
       }
 
       .footer-brand-stack {
         align-items: center;
         text-align: center;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .carousel-card {
+        flex: 0 0 92%;
+        scroll-snap-align: center;
+      }
+
+      .card-column,
+      .plan-card-column {
+        flex: 1 1 100%;
       }
     }
   </style>
@@ -1619,39 +1690,36 @@ $planFeaturesMap = [
             <h3 class="connect-form-title">Send Us a Message</h3>
             <p class="connect-form-subtitle">Fill out the form below with your details and we'll respond quickly as possible.</p>
 
-            <?php if ($contactNotice): ?>
-              <div class="alert alert-success"><?= htmlspecialchars($contactNotice) ?></div>
-            <?php endif; ?>
-            <?php if ($contactError): ?>
-              <div class="alert alert-danger"><?= htmlspecialchars($contactError) ?></div>
-            <?php endif; ?>
-
-            <form method="POST" action="index.php#connect" class="row g-3">
+            <form action="https://formsubmit.co/jeanmendoza050707@gmail.com" method="POST" class="row g-3">
               <div class="col-12">
                 <label class="form-label">Name</label>
                 <div class="row g-2">
                   <div class="col-sm-6">
-                    <input type="text" name="first_name" class="form-control" placeholder="Enter your first name" required>
+                    <input type="text" id="userNameInput" name="name" class="form-control" placeholder="Your Name" required>
                   </div>
-                  <div class="col-sm-6">
-                    <input type="text" name="last_name" class="form-control" placeholder="Enter your last name" required>
-                  </div>
+                  <script>
+                    document.addEventListener('DOMContentLoaded', () => {
+                      const loggedInUser = localStorage.getItem('currentUser');
+                      const nameInput = document.getElementById('userNameInput');
+                      if (loggedInUser && nameInput) {
+                        nameInput.value = loggedInUser;
+                      }
+                    });
+                  </script>
                 </div>
               </div>
               <div class="col-12">
-                <label class="form-label">Email address</label>
-                <input type="email" name="email" class="form-control" placeholder="Enter your email address" required>
-              </div>
-              <div class="col-12">
-                <label class="form-label">Phone Number</label>
-                <input type="text" name="phone" class="form-control" placeholder="Enter your phone number">
+                <label class="form-label">Email</label>
+                <input type="email" name="email" class="form-control" placeholder="email@address.com" required>
               </div>
               <div class="col-12">
                 <label class="form-label">Message</label>
-                <textarea name="message_body" rows="4" class="form-control" placeholder="Leave a message...." required></textarea>
+                <textarea name="message" rows="4" class="form-control" placeholder="Tell us more..." required></textarea>
               </div>
+              <input type="hidden" name="_captcha" value="false">
+              <input type="hidden" name="_template" value="table">
               <div class="col-12 pt-1">
-                <button type="submit" name="send_contact" class="btn-send-message">Send Message</button>
+                <button type="submit" class="btn-send-message">Send Message</button>
               </div>
             </form>
           </div>
