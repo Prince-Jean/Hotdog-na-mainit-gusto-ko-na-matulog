@@ -5,6 +5,40 @@ require_once __DIR__ . '/app/bootstrap.php';
 
 use App\Models\Client;
 use App\Models\Trainer;
+use App\Models\PaymentAndMessage;
+
+$contactNotice = null;
+$contactError = null;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_contact'])) {
+    $fullName = trim($_POST['name'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $msg = trim($_POST['message'] ?? '');
+
+    $nameParts = preg_split('/\s+/', $fullName, 2) ?: [];
+    $fn = trim($nameParts[0] ?? '');
+    $ln = trim($nameParts[1] ?? '');
+    if ($fn !== '' && $ln === '') {
+        $ln = $fn;
+    }
+    $phone = '';
+
+    if ($fn === '' || $ln === '' || !filter_var($email, FILTER_VALIDATE_EMAIL) || $msg === '') {
+        $contactError = 'Please fill in all required fields with a valid email address.';
+    } else {
+        try {
+            $pm = new PaymentAndMessage();
+            $ok = $pm->createContactMessage($fn, $ln, $email, $phone, $msg);
+            if ($ok) {
+                $contactNotice = 'Thank you! Your inquiry has been sent to our Dagupan front desk team.';
+            } else {
+                $contactError = 'Unable to submit inquiry at this moment.';
+            }
+        } catch (Throwable $e) {
+            $contactError = 'Database connection unavailable. Please import database/gym_database.sql first.';
+        }
+    }
+}
 
 $memberships = [];
 $trainers = [];
@@ -1420,6 +1454,7 @@ $planFeaturesMap = [
             <a href="<?= htmlspecialchars($dashboardUrl) ?>" class="btn btn-admin">PORTAL</a>
             <a href="logout.php" class="btn btn-admin">LOGOUT</a>
           <?php else: ?>
+            <a href="member_signup.php" class="btn btn-admin">REGISTER</a>
             <a href="login.php" class="btn btn-admin">LOGIN</a>
           <?php endif; ?>
         </div>
@@ -1690,7 +1725,14 @@ $planFeaturesMap = [
             <h3 class="connect-form-title">Send Us a Message</h3>
             <p class="connect-form-subtitle">Fill out the form below with your details and we'll respond quickly as possible.</p>
 
-            <form action="https://formsubmit.co/jeanmendoza050707@gmail.com" method="POST" class="row g-3">
+            <?php if ($contactNotice): ?>
+              <div class="alert alert-success"><?= htmlspecialchars($contactNotice) ?></div>
+            <?php endif; ?>
+            <?php if ($contactError): ?>
+              <div class="alert alert-danger"><?= htmlspecialchars($contactError) ?></div>
+            <?php endif; ?>
+
+            <form method="POST" action="index.php#connect" class="row g-3">
               <div class="col-12">
                 <label class="form-label">Name</label>
                 <div class="row g-2">
@@ -1716,10 +1758,8 @@ $planFeaturesMap = [
                 <label class="form-label">Message</label>
                 <textarea name="message" rows="4" class="form-control" placeholder="Tell us more..." required></textarea>
               </div>
-              <input type="hidden" name="_captcha" value="false">
-              <input type="hidden" name="_template" value="table">
               <div class="col-12 pt-1">
-                <button type="submit" class="btn-send-message">Send Message</button>
+                <button type="submit" name="send_contact" class="btn-send-message">Send Message</button>
               </div>
             </form>
           </div>
